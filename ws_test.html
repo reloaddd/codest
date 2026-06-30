@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Submissions</title>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+    <h2>Live Code Judge Updates</h2>
+    <div id="messages" style="background: #f4f4f4; padding: 10px; height: 300px; overflow-y: scroll; font-family: monospace;">
+        Waiting for connection...<br>
+    </div>
+
+    <script>
+        var ws = new WebSocket("ws://127.0.0.1:8000/ws/live-updates");
+        var messagesDiv = document.getElementById("messages");
+
+        ws.onopen = function() {
+            messagesDiv.innerHTML += "<span style='color: green;'>Connected to Live Server!</span><br>";
+        };
+
+        ws.onmessage = function(event) {
+            // Whenever the server shouts a message, print it here
+            messagesDiv.innerHTML += "🔔 <b>Update:</b> " + event.data + "<br>";
+        };
+
+        ws.onclose = function() {
+            messagesDiv.innerHTML += "<span style='color: red;'>Disconnected.</span><br>";
+        };
+    </script>
+</body>
+</html>

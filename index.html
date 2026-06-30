@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* WARM, GRAINY, SOOTHING THEME */
+        body { 
+            background-color: #f4f1ea; 
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            color: #433e38; 
+        }
+        
+        .cf-header { 
+            background-color: rgba(252, 251, 248, 0.95); 
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #dfd9ce; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+        .cf-container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        
+        .cf-box { 
+            background: #fdfcf9; 
+            border: 1px solid #dfd9ce; 
+            border-radius: 8px; 
+            margin-bottom: 1rem; 
+            box-shadow: 0 4px 12px rgba(60, 55, 48, 0.03); 
+            overflow: hidden;
+        }
+        .cf-box-header { 
+            background: #f0ece3; 
+            border-bottom: 1px solid #dfd9ce; 
+            padding: 0.75rem 1.25rem; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            color: #635b51;
+        }
+        
+        .cf-link { color: #a5614a; text-decoration: none; cursor: pointer; transition: all 0.2s; }
+        .cf-link:hover { color: #874e3a; text-decoration: underline; }
+        .nav-link { color: #5a7587; cursor: pointer; transition: color 0.2s; font-weight: bold; }
+        .nav-link:hover { color: #3b505f; }
+        
+        .cf-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .cf-table th { background-color: #f0ece3; padding: 0.75rem 1rem; text-align: left; border-bottom: 2px solid #dfd9ce; color: #72685d; font-weight: 600; }
+        .cf-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #eeeadd; }
+        .cf-table tr:hover { background-color: #f8f6f0; }
+
+        .warm-btn {
+            background-color: #e8e3d5; border: 1px solid #d1cbc1; color: #5c5346; transition: all 0.2s;
+        }
+        .warm-btn:hover { background-color: #dfd9ce; }
+
+        /* DEV-C++ RETRO IDE AESTHETIC (Untouched for that core feel) */
+        .dev-cpp-container { background-color: #F0F0F0; border: 2px solid; border-color: #FFFFFF #808080 #808080 #FFFFFF; padding: 2px; }
+        .dev-cpp-toolbar { background-color: #F0F0F0; display: flex; gap: 4px; padding: 4px; border-bottom: 1px solid #A0A0A0; margin-bottom: 4px; }
+        .dev-cpp-btn { 
+            background: #E0E0E0; border: 1px solid; border-color: #FFFFFF #808080 #808080 #FFFFFF; 
+            padding: 2px 8px; font-size: 0.75rem; display: flex; align-items: center; cursor: pointer; color: black;
+            font-family: Arial, sans-serif;
+        }
+        .dev-cpp-btn:active { border-color: #808080 #FFFFFF #FFFFFF #808080; padding: 3px 7px 1px 9px; }
+        .dev-cpp-editor-wrapper { border: 2px solid; border-color: #808080 #FFFFFF #FFFFFF #808080; background: white; }
+        .dev-cpp-textarea { 
+            width: 100%; height: 350px; font-family: 'Courier New', Courier, monospace; 
+            font-size: 14px; padding: 6px; outline: none; border: none; resize: vertical; color: #000;
+        }
+        .dev-cpp-console {
+            background-color: #FFFFFF; font-family: 'Courier New', Courier, monospace; font-size: 13px;
+            border: 2px solid; border-color: #808080 #FFFFFF #FFFFFF #808080; height: 120px; overflow-y: auto; padding: 4px; color: #000;
+        }
+        .dev-cpp-tab { background: #FFFFFF; border: 1px solid #A0A0A0; border-bottom: none; padding: 2px 10px; font-size: 0.8rem; display: inline-block; margin-top: 8px; color: #000; font-family: Arial, sans-serif;}
+
+        .hidden-section { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER (CONSOLIDATED) -->
+    <div class="cf-header py-4 sticky top-0 z-50">
+        <div class="cf-container flex justify-between items-center">
+            
+            <div class="flex items-center gap-8">
+                <div class="text-3xl font-bold tracking-tight cursor-pointer" style="font-family: 'Georgia', serif;" onclick="showSection('dashboard')">
+                    <span style="color: #4e6e7d;">Cod</span><span style="color: #a5614a;">est</span>
+                </div>
+                <!-- Main Nav Links moved into the Header -->
+                <div class="hidden md:flex gap-6 text-sm">
+                    <a class="nav-link" onclick="showSection('dashboard')">PROBLEMSET</a>
+                    <a class="nav-link" onclick="fetchLeaderboard()">RATING</a>
+                </div>
+            </div>
+
+            <div class="text-sm font-medium space-x-2">
+                <span id="nav-guest">
+                    <a class="cf-link" onclick="showSection('login')">Enter</a> <span class="text-[#d1cbc1] mx-1">|</span> 
+                    <a class="cf-link" onclick="toggleAuthMode(); showSection('login')">Register</a>
+                </span>
+                <span id="nav-user" class="hidden flex items-center gap-2">
+                    <span style="color: #898075;">👤</span>
+                    <a class="cf-link font-bold text-[#433e38] text-base" onclick="openProfile()" id="nav-username"></a> 
+                    <span class="text-[#d1cbc1] mx-1">|</span> 
+                    <a class="cf-link" onclick="logout()">Logout</a>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="cf-container flex flex-col md:flex-row gap-6 mt-8">
+        
+        <div class="w-full md:w-3/4">
+
+            <!-- 1. PROFILE DASHBOARD -->
+            <section id="profile-section" class="hidden-section cf-box max-w-xl mx-auto shadow-sm">
+                <div class="cf-box-header">Hacker Profile</div>
+                <div class="p-8 text-center">
+                    <div class="text-6xl mb-4">👤</div>
+                    <h2 class="text-3xl font-bold text-[#433e38] mb-1" id="profile-handle">Loading...</h2>
+                    <p class="text-[#898075] mb-6" id="profile-email"></p>
+                    
+                    <div class="bg-[#fdfcf9] border border-[#dfd9ce] rounded-lg p-6 flex justify-around mt-4 shadow-inner">
+                        <div>
+                            <div class="text-sm text-[#898075] uppercase tracking-wider font-bold mb-1">Rank</div>
+                            <div class="text-2xl font-bold text-[#5a7587]" id="profile-rank">--</div>
+                        </div>
+                        <div class="border-l border-[#dfd9ce]"></div>
+                        <div>
+                            <div class="text-sm text-[#898075] uppercase tracking-wider font-bold mb-1">Total Solved</div>
+                            <div class="text-2xl font-bold text-[#a5614a]" id="profile-score">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. AUTHENTICATION SECTION -->
+            <section id="login-section" class="cf-box max-w-md mx-auto shadow-lg">
+                <div class="cf-box-header" id="auth-title">Authentication</div>
+                <div class="p-8">
+                    <div id="auth-error" class="hidden text-[#a5614a] font-bold text-sm mb-6 bg-[#fdf2ef] p-3 rounded border border-[#fadcd3]"></div>
+                    <table class="w-full text-sm border-separate" style="border-spacing: 0 12px;">
+                        <tr>
+                            <td class="font-bold text-right pr-4 text-[#635b51]">Handle:</td>
+                            <td><input type="text" id="username" class="border border-[#dfd9ce] rounded p-2 w-full focus:outline-none focus:border-[#a5614a] bg-[#fdfcf9]"></td>
+                        </tr>
+                        <tr id="email-row" class="hidden">
+                            <td class="font-bold text-right pr-4 text-[#635b51]">Email:</td>
+                            <td><input type="email" id="email" class="border border-[#dfd9ce] rounded p-2 w-full focus:outline-none focus:border-[#a5614a] bg-[#fdfcf9]"></td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-right pr-4 text-[#635b51]">Password:</td>
+                            <td><input type="password" id="password" class="border border-[#dfd9ce] rounded p-2 w-full focus:outline-none focus:border-[#a5614a] bg-[#fdfcf9]"></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="pt-4">
+                                <button onclick="handleAuth()" id="auth-btn" class="warm-btn rounded px-6 py-2 shadow-sm font-bold w-full">Login</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. DASHBOARD (Problem Set) -->
+            <section id="dashboard-section" class="hidden-section">
+                <div class="cf-box">
+                    <div class="cf-box-header flex justify-between items-center">
+                        <span>Problems</span>
+                        <div class="flex gap-2">
+                            <input type="text" id="search-bar" placeholder="Filter by title..." class="border border-[#dfd9ce] rounded p-1.5 text-xs bg-[#fdfcf9] focus:outline-none focus:border-[#5a7587]">
+                            <button onclick="fetchProblems()" class="warm-btn rounded px-3 text-xs font-semibold">Apply</button>
+                        </div>
+                    </div>
+                    <div class="p-0">
+                        <table class="cf-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-16 text-center">#</th>
+                                    <th>Name</th>
+                                    <th class="w-32 text-center">Difficulty</th>
+                                    <th class="w-24 text-center"><span title="Solved count">👤&#x1F5F2;</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="problems-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. WORKSPACE (Problem + Dev-C++ Editor) -->
+            <section id="workspace-section" class="hidden-section">
+                <div class="flex flex-col gap-6">
+                    
+                    <div class="cf-box p-8" style="font-family: 'Georgia', serif;">
+                        <div class="text-center mb-8 border-b border-[#dfd9ce] pb-6">
+                            <h2 id="ws-title" class="text-2xl font-bold mb-3" style="color: #433e38;">Problem Title</h2>
+                            <div class="text-sm text-[#898075]">time limit per test: 2-5 seconds</div>
+                            <div class="text-sm text-[#898075]">memory limit per test: 256 megabytes</div>
+                            <div class="text-sm font-bold mt-4">Difficulty: <span id="ws-difficulty" style="color: #5a7587;">Medium</span></div>
+                        </div>
+                        <p id="ws-desc" class="text-base leading-relaxed whitespace-pre-wrap text-justify text-[#433e38]"></p>
+                    </div>
+
+                    <div class="cf-box" style="border: none; background: transparent; box-shadow: none;">
+                        <div class="cf-box-header rounded-t-lg" style="background: #e8e3d5; border-color: #c9c2b5;">Submit Code</div>
+                        <div class="p-0">
+                            <!-- Dev-C++ Container -->
+                            <div class="dev-cpp-container">
+                                <div class="dev-cpp-toolbar">
+                                    <select id="lang-select" class="text-xs border border-gray-400 p-1 mr-2 bg-white" style="font-family: Arial;">
+                                        <option value="python">Python 3.11</option>
+                                        <option value="cpp">GNU C++20</option>
+                                        <option value="java">Java 17 (Class 'Main')</option>
+                                    </select>
+                                    <button onclick="submitCode()" id="submit-btn" class="dev-cpp-btn">
+                                        <span class="text-green-600 mr-1">▶</span> Compile & Run (F11)
+                                    </button>
+                                </div>
+                                
+                                <div class="dev-cpp-editor-wrapper">
+                                    <textarea id="code-editor" class="dev-cpp-textarea" spellcheck="false" placeholder="// Write your code here...&#10;// Important for Java: Your public class MUST be named 'Main'"></textarea>
+                                </div>
+                                
+                                <div class="dev-cpp-tab">Compiler Log</div>
+                                <div class="dev-cpp-console" id="console-output">
+                                    <div style="color: #808080;">Workspace ready. Waiting for execution...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. LEADERBOARD -->
+            <section id="leaderboard-section" class="hidden-section cf-box">
+                <div class="cf-box-header">Standings</div>
+                <div class="p-0">
+                    <table class="cf-table text-center">
+                        <thead>
+                            <tr>
+                                <th class="w-16 text-center">#</th>
+                                <th class="text-left">Who</th>
+                                <th class="w-32 text-center">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- RIGHT SIDEBAR (25%) -->
+        <div class="w-full md:w-1/4 hidden md:block font-sans">
+            <div class="cf-box">
+                <div class="cf-box-header">System Info</div>
+                <div class="p-4 text-sm leading-relaxed border-b border-[#dfd9ce] text-[#635b51]">
+                    <b>Compilers Active:</b><br>
+                    - Python 3.11<br>
+                    - GCC 12.2 (C++)<br>
+                    - OpenJDK 17
+                </div>
+                <div class="p-4 text-sm leading-relaxed text-[#5a7587] font-semibold bg-[#f0f4f5]">
+                    Phase 9 coming soon: Dockerization!
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let currentToken = localStorage.getItem("access_token");
+        let activeProblemId = null;
+        let isRegistering = false;
+        let ws = null;
+
+        window.onload = async () => {
+            if (currentToken) {
+                document.getElementById('nav-guest').classList.add('hidden');
+                document.getElementById('nav-user').classList.remove('hidden');
+                
+                // Fetch basic user info on load
+                try {
+                    const res = await fetch(`${API_URL}/users/me`, { headers: { 'Authorization': `Bearer ${currentToken}` }});
+                    const user = await res.json();
+                    document.getElementById('nav-username').innerText = "@" + user.username;
+                } catch(e) { logout(); }
+                
+                fetchProblems();
+            } else {
+                showSection('dashboard'); 
+                fetchProblems();
+            }
+            initWebSocket();
+        };
+
+        function showSection(sectionId) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden-section'));
+            document.getElementById(sectionId + '-section').classList.remove('hidden-section');
+        }
+
+        // PROFILE DASHBOARD
+        async function openProfile() {
+            try {
+                // Fetch User Details
+                const res = await fetch(`${API_URL}/users/me`, { headers: { 'Authorization': `Bearer ${currentToken}` }});
+                const user = await res.json();
+                
+                document.getElementById('profile-handle').innerText = "@" + user.username;
+                document.getElementById('profile-email').innerText = user.email;
+                
+                // Fetch Leaderboard for Rank/Score
+                const leadRes = await fetch(`${API_URL}/leaderboard/`);
+                const ranks = await leadRes.json();
+                const myStats = ranks.find(r => r.username === user.username);
+                
+                document.getElementById('profile-rank').innerText = myStats ? "#" + myStats.rank : "N/A";
+                document.getElementById('profile-score').innerText = myStats ? myStats.score : "0";
+                
+                showSection('profile');
+            } catch (err) {
+                alert("Failed to load profile.");
+            }
+        }
+
+        // AUTH
+        function toggleAuthMode() {
+            isRegistering = !isRegistering;
+            document.getElementById('email-row').classList.toggle('hidden');
+            document.getElementById('auth-title').innerText = isRegistering ? "Registration" : "Authentication";
+            document.getElementById('auth-btn').innerText = isRegistering ? "Register" : "Login";
+        }
+
+        async function handleAuth() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const errorDiv = document.getElementById('auth-error');
+            
+            try {
+                if (isRegistering) {
+                    const res = await fetch(`${API_URL}/users/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password })
+                    });
+                    if (!res.ok) throw new Error(await res.text());
+                    isRegistering = false; 
+                    await handleAuth(); 
+                } else {
+                    const formData = new URLSearchParams();
+                    formData.append('username', username);
+                    formData.append('password', password);
+                    
+                    const res = await fetch(`${API_URL}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                    if (!res.ok) throw new Error("Invalid username or password");
+                    
+                    const data = await res.json();
+                    currentToken = data.access_token;
+                    localStorage.setItem("access_token", currentToken);
+                    
+                    errorDiv.classList.add('hidden');
+                    window.onload(); 
+                }
+            } catch (err) {
+                errorDiv.innerText = err.message || "An error occurred";
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("access_token");
+            currentToken = null;
+            document.getElementById('nav-guest').classList.remove('hidden');
+            document.getElementById('nav-user').classList.add('hidden');
+            showSection('login');
+        }
+
+        // PROBLEMS
+        async function fetchProblems() {
+            const search = document.getElementById('search-bar').value;
+            try {
+                const res = await fetch(`${API_URL}/problems/?search=${search}`);
+                const problems = await res.json();
+                
+                const tbody = document.getElementById('problems-list');
+                tbody.innerHTML = "";
+                
+                problems.forEach(p => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="text-center font-bold text-[#898075]">${p.id}</td>
+                            <td><a class="cf-link font-bold text-[#5a7587]" onclick='openWorkspace(${JSON.stringify(p)})'>${p.title}</a></td>
+                            <td class="text-center text-[#635b51] font-medium">${p.difficulty}</td>
+                            <td class="text-center text-xs text-[#898075]">👤 x${p.solved_count}</td>
+                        </tr>
+                    `;
+                });
+                showSection('dashboard');
+            } catch (err) {
+                console.error("Failed to fetch problems", err);
+            }
+        }
+
+        function openWorkspace(problem) {
+            if (!currentToken) {
+                showSection('login');
+                document.getElementById('auth-error').innerText = "Please login to solve problems.";
+                document.getElementById('auth-error').classList.remove('hidden');
+                return;
+            }
+            
+            activeProblemId = problem.id;
+            document.getElementById('ws-title').innerText = problem.title;
+            document.getElementById('ws-desc').innerText = problem.description;
+            document.getElementById('ws-difficulty').innerText = problem.difficulty;
+            document.getElementById('console-output').innerHTML = "<div style='color: #808080;'>Workspace ready. Waiting for execution...</div>";
+            
+            showSection('workspace');
+        }
+
+        // WEBSOCKETS & EXECUTION
+        function initWebSocket() {
+            if (ws) ws.close();
+            ws = new WebSocket("ws://127.0.0.1:8000/ws/live-updates");
+            
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    const consoleDiv = document.getElementById('console-output');
+                    
+                    let color = "color: #ff9900;"; 
+                    if(data.status === "Accepted") color = "color: #00aa00; font-weight: bold;";
+                    if(data.status.includes("Wrong") || data.status.includes("Error")) color = "color: #dd0000; font-weight: bold;";
+                    
+                    consoleDiv.innerHTML += `<div><span style="color: blue;">[System]</span> Sub #${data.submission_id}: <span style="${color}">${data.status}</span></div>`;
+                    consoleDiv.scrollTop = consoleDiv.scrollHeight;
+                    
+                    document.getElementById('submit-btn').disabled = false;
+                    document.getElementById('submit-btn').innerHTML = `<span class="text-green-600 mr-1">▶</span> Compile & Run (F11)`;
+                } catch(e) {}
+            };
+        }
+
+        async function submitCode() {
+            const code = document.getElementById('code-editor').value;
+            const lang = document.getElementById('lang-select').value;
+            
+            if(!code.trim()) return alert("Please write some code!");
+            
+            const btn = document.getElementById('submit-btn');
+            const consoleDiv = document.getElementById('console-output');
+            
+            btn.disabled = true;
+            btn.innerHTML = `<span class="text-gray-500 mr-1">⌛</span> Compiling...`;
+            consoleDiv.innerHTML += `<div><span style="color: #666;">> Building for ${lang.toUpperCase()}...</span></div>`;
+
+            try {
+                const res = await fetch(`${API_URL}/submissions/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentToken}` },
+                    body: JSON.stringify({ problem_id: activeProblemId, language: lang, code: code })
+                });
+                
+                if (!res.ok) {
+                    if (res.status === 401) { logout(); throw new Error("Session expired."); }
+                    throw new Error("Submission failed");
+                }
+                
+                const data = await res.json();
+                consoleDiv.innerHTML += `<div><span style="color: #666;">> Handed to Background Worker (ID: ${data.id}). Awaiting compilation result...</span></div>`;
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+                
+            } catch (err) {
+                consoleDiv.innerHTML += `<div style="color: red;">Error: ${err.message}</div>`;
+                btn.disabled = false;
+                btn.innerHTML = `<span class="text-green-600 mr-1">▶</span> Compile & Run (F11)`;
+            }
+        }
+
+        // LEADERBOARD
+        async function fetchLeaderboard() {
+            try {
+                const res = await fetch(`${API_URL}/leaderboard/`);
+                const ranks = await res.json();
+                
+                const tbody = document.getElementById('leaderboard-list');
+                tbody.innerHTML = "";
+                
+                ranks.forEach((r, index) => {
+                    let rankClass = "font-bold text-[#898075]"; 
+                    if(r.score >= 10) rankClass = "font-bold text-[#5a7587]"; 
+                    if(r.score >= 20) rankClass = "font-bold text-[#d48c59]"; 
+                    if(r.score >= 50) rankClass = "font-bold text-[#a5614a]"; 
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="text-[#898075]">${r.rank}</td>
+                            <td class="text-left"><a class="cf-link ${rankClass}">${r.username}</a></td>
+                            <td class="font-bold text-[#635b51]">${r.score}</td>
+                        </tr>
+                    `;
+                });
+                showSection('leaderboard');
+            } catch (err) {
+                console.error("Failed to fetch leaderboard", err);
+            }
+        }
+    </script>
+</body>
+</html>
